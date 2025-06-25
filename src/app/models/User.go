@@ -29,12 +29,16 @@ func VerifyPassword(hashedPassword, password string) error {
 }
 
 func (u *User) BeforeSave(*gorm.DB) error {
-	hashedPassword, err := Hash(u.Password)
-	if err != nil {
-		return err
-	}
-	u.Password = string(hashedPassword)
-	return nil
+    // Check if password is already hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
+    if strings.HasPrefix(u.Password, "$2a$") || strings.HasPrefix(u.Password, "$2b$") || strings.HasPrefix(u.Password, "$2y$") {
+        return nil
+    }
+    hashedPassword, err := Hash(u.Password)
+    if err != nil {
+        return err
+    }
+    u.Password = string(hashedPassword)
+    return nil
 }
 
 func (u *User) Prepare() {

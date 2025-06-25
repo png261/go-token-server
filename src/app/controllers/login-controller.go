@@ -2,7 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"io"
 
 	"github.com/bytesfield/golang-gin-auth-service/src/app/models"
 	"github.com/bytesfield/golang-gin-auth-service/src/app/responses"
@@ -12,7 +13,7 @@ import (
 )
 
 func (server *Server) Login(c *gin.Context) {
-	body, err := ioutil.ReadAll(c.Request.Body)
+	body, err := io.ReadAll(c.Request.Body)
 
 	if err != nil {
 		responses.ValidationError(c, "Validation Error", err)
@@ -21,6 +22,7 @@ func (server *Server) Login(c *gin.Context) {
 	user := models.User{}
 
 	err = json.Unmarshal(body, &user)
+	fmt.Print(user)
 
 	if err != nil {
 		responses.ValidationError(c, "Validation Error", err)
@@ -35,6 +37,7 @@ func (server *Server) Login(c *gin.Context) {
 		responses.ValidationError(c, "Validation Error", err)
 		return
 	}
+	fmt.Print("validated")
 
 	token, err := server.SignIn(user.Email, user.Password)
 
@@ -60,12 +63,19 @@ func (server *Server) SignIn(email, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Print(password)
+	fmt.Print(user.Password)
+
+	fmt.Println("Password to verify:", password)
+	fmt.Println("Hashed in DB:", user.Password)
+	fmt.Println("Error?", bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)))
 
 	err = models.VerifyPassword(user.Password, password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", err
 	}
+	fmt.Print("donee")
 
 	return services.CreateToken(uint32(user.ID))
 }

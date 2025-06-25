@@ -4,8 +4,6 @@ package config
 type Configurations struct {
 	Server          ServerConfigurations
 	Database        DatabaseConfigurations
-	MAILGUN_API_KEY string
-	MAILGUN_DOMAIN  string
 	JWT_SECRET      string
 }
 

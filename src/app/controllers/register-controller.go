@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/bytesfield/golang-gin-auth-service/src/app/models"
 	userRepository "github.com/bytesfield/golang-gin-auth-service/src/app/repositories"
 	"github.com/bytesfield/golang-gin-auth-service/src/app/responses"
-	"github.com/bytesfield/golang-gin-auth-service/src/app/services"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -49,10 +47,6 @@ func (server *Server) Register(ctx *gin.Context) {
 
 		return
 	}
-
-	mailgunService := services.MailgunSend{}
-
-	mailgunService.To(user.Email).From(os.Getenv("APP_EMAIL")).Subject("Welcome Email").Template("This is a welcome message").Send()
 
 	ctx.Header("Location", fmt.Sprintf("%s%s/%d", ctx.Request.Host, ctx.Request.RequestURI, userCreated.ID))
 
